@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style type="text/css">
+
+	* {
+		font-family: Roboto;
+		font-size: 2vh;
+		overflow: hidden;
+	}
+
+
+	.node {
+    cursor: pointer;
+  }
+
+	.node:hover > text {
+  		font-weight: bold;
+  		font-size: 20px;
+	}
+
+  .overlay{
+			position:absolute;
+			background-color: #EEE;
+			width: 80%;
+			height: 100%;
+			right:5%;
+  }
+
+  .node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+  }
+
+  .node text {
+    font-size:14px;
+		transition: font-size 0.05s;
+  }
+
+  .link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1.5px;
+  }
+
+  .templink {
+    fill: none;
+    stroke: red;
+    stroke-width: 3px;
+  }
+
+  .ghostCircle.show{
+      display:block;
+  }
+
+  .ghostCircle, .activeDrag .ghostCircle{
+       display: none;
+  }
+
+	/* .tree {
+		position: absolute;
+		left: 250px;
+		top: 65px;
+		width: 100vh;
+		height: 100vh;
+		font-family: Roboto;
+	} */
+
+	.three_d_graph {
+		left: 0px;
+		top:0px;
+		width: 1200px;
+		height:800px;
+		/* display:none; */
+	}
+
+
+
+	.pop-up-x-button, .clipboard-x-button {
+    position: absolute;
+		top: 0px;
+		right: 5%;
+    font-size: 4vh;
+    font-weight: bold;
+		cursor: pointer;
+}
+
+
+	.pop-up-container, .clipboard-container {
+		transition: all 0.8s ease;
+	}
+
+	.right-cover {
+		position:absolute;
+		top:65px;
+		left: 1300px;
+		width: 10000px;
+		height: 700px;
+		background-color:white;
+
+	}
+
+	.sidebar {
+		position: absolute;
+		top:0px;
+		right: 0px;
+		width: 5%;
+		height: 100%;
+		background-color:#060405;
+
+	}
+
+	.material-icons.md-light { color: rgba(255, 255, 255, 1); }
+	.material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
+	.material-icons.md-7vh { font-size: 7vh; }
+
+	.noselect {
+		-webkit-touch-callout: none; /* iOS Safari */
+	    -webkit-user-select: none; /* Safari */
+	     -khtml-user-select: none; /* Konqueror HTML */
+	       -moz-user-select: none; /* Firefox */
+	        -ms-user-select: none; /* Internet Explorer/Edge */
+	            user-select: none; /*Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+	}
+
+	#assignment, #view_headline, #settings, #contact_mail {
+		position: absolute;
+		padding: 20%;
+		margin: auto;
+		transition: color 0.8s ease;
+	}
+
+	#assignment:hover, #settings:hover, #view_headline:hover, #contact_mail:hover {
+		cursor: pointer;
+	}
+	#view_headline {top: 10%;}
+	#assignment {top: 20%;}
+	#settings {top: 30%;}
+	#contact_mail {top: 40%;}
+
+	.pop-up-container, .clipboard-container{
+		text-align:center;
+		position:absolute;
+		height: 84%;
+		background-color:white;
+		padding: 1.5%;
+		top: 9%;
+		box-shadow: 0px 8px 18px rgba(59, 43, 91, 0.7);
+		border-radius: 2%;
+		line-height: 1.5;
+	}
+
+	.clipboard-name {
+		font-size: 3vh;
+		font-weight: bold;
+	}
+
+	.clipboard-text {
+		margin-top:4%;
+		height:80%;
+		overflow: scroll;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+	.pop-up-container,.clipboard-container {
+		right: -20%;
+		width: 20%;
+	}
+
+
+	.claim-name {
+			font-size:3vh;
+			font-weight:bold;
+	}
+
+	.claim-text {
+		position:absolute;
+		top: 18%;
+		height: 67%;
+		overflow: scroll;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+	.claim-text::-webkit-scrollbar,.search-results::-webkit-scrollbar {
+	    width: 1em;
+	}
+
+	.claim-text::-webkit-scrollbar-track,.search-results::-webkit-scrollbar-track {
+	    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	}
+
+	.claim-text::-webkit-scrollbar-thumb,.search-results::-webkit-scrollbar-thumb {
+	  background-color: darkgrey;
+	  outline: 1px solid slategrey;
+	}
+
+	.claim-reason,.ind-claim,.dep-claim,.source {
+			padding-right: 5%;
+	}
+
+	.ind-claim,.dep-claim,.source {
+			text-align:left;
+	}
+
+	.claim-reason,.source {
+			font-style:italic;
+	}
+
+	.clipboard-button,.save-button {
+		width: 85%;
+		height: 10%;
+		position: absolute;
+		bottom: 2%;
+		right: 7.5%;
+		border-radius: 5px;
+		background-color: #e8e8e8;
+		cursor:pointer;
+	}
+
+	.clipboard-button:hover,.save-button:hover, .pop-up-x-button:hover, .clipboard-x-button:hover {
+		opacity: 0.7;
+	}
+	.add-to-clipboard,.added-text,.download {
+		position:absolute;
+		height:3vh;
+		width:100%;
+		left:0%;
+		top:calc(50% - 2.5vh);
+		font-size:3vh;
+		font-weight:bold;
+		overflow: visible;
+		vertical-align: middle;
+	}
+
+	.added-text {
+		left:100%;
+	}
+
+	body > header {
+		background-image: linear-gradient(#05668C, #0CA5B1);
+		grid-area: head;
+		display: flex;
+		position: absolute;
+		top:0px;
+		left:0px;
+		height:8%;
+		width: 100%;
+	}
+
+	.title-container {
+		position:absolute;
+		/* line-height: 60px; */
+		height: 80%;
+		top: 10%;
+		left: 1%;
+		width: 0px;
+		overflow: hidden;
+		white-space: nowrap;
+		font-weight:bold;
+		color: #fff;
+		border-right: 0.2vh solid #fff;
+		transition: width 2s;
+	}
+
+	.title-visible {
+		font-size: 6vh;
+
+	}
+
+	.title-hidden {
+		display:none;
+	}
+
+	.search-container {
+		position: absolute;
+		top: 9%;
+		left: 0px;
+		width:16%;
+		height: 90%;
+	}
+
+	.search-results {
+		position:absolute;
+		left:-8%;
+		top: 7%;
+		height: 93%;
+		width: 100%;
+		overflow: scroll;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+	.search-bar {
+		font-size: 3vh;
+		border: 0.2vh solid #CCC;
+		margin-top:1%;
+		height:5%;
+		width:82%;
+		margin-left: 2%;
+		border-radius: 1vh;
+		padding-inline-start:5%;
+		outline: none;
+	}
+
+	.ols {
+		padding-inline-start:10%;
+	}
+
+	.lis:hover {
+		cursor:pointer;
+		background-color: lightsteelblue;
+	}
+
+	id {
+		visibility: hidden;
+	}
+
+	.highlight {
+		background-color: lightsteelblue;
+	}
+
+	.clipboardItem {
+		list-style: none;
+	  background-color: white;
+	  padding: 4%;
+	  border: 0.2vh solid #CCC;
+		margin-top:1%;
+	  margin-bottom: 1%;
+		margin-left:1%;
+	  width: 96%;
+	  box-sizing: border-box;
+	  cursor: pointer;
+	  border-radius: 1vh;
+	}
+
+	.added {
+		background-color: #C7EFDE;
+	}
+
+	.transition-01s {
+		transition: all 0.1s ease;
+	}
+
+	.bolded {
+		font-weight:bold;
+	}
+
+
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://unpkg.com/docx@4.0.0/build/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.js"></script>
+<script src="highlight.js"></script>
+<script src="makeWorddoc.js"></script>
+<script src="dndTree.js"></script>
+<head>
+		<title>Patent Visualization Tool</title>
+		<link rel="shortcut icon" type="image/x-icon" href="bi-icon.png" />
+		<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Material+Icons' rel='stylesheet'>
+</head>
+<body>
+
+    <div class="tree" id="tree-container"></div>
+		<div class="pop-up-container" id="pop-up-container">
+				<span class="pop-up-x-button noselect">&times;</span>
+				<div class="claim-name" id="claim-name"></div>
+				<div class="claim-text" id="claim-text" ></div>
+				<div class="clipboard-button noselect transition-01s">
+						<div class="add-to-clipboard transition-01s">Add to Clipboard &#x270E;</div>
+						<div class="added-text transition-01s">Added ✔</div>
+				</div>
+		</div>
+
+		</div>
+
+		<header class="header">
+				<div class="title-container">
+						<span id="full-name" class="title-visible">Patent Visualization Tool</span>
+						<span id="acronym" class="title-hidden">PVT</span>
+				</div>
+		</header>
+
+		<div class="search-container">
+				<input value = '' placeholder="Search ⌕" type="text" contenteditable="true" class="search-bar" id="search-bar"></input>
+				<div class="search-results" id='search-results'></div>
+		</div>
+
+		<div class="clipboard-container" id="clipboard-container">
+				<span class="clipboard-x-button noselect">&times;</span>
+				<div class="clipboard-name">Your Clipboard</div>
+				<div class="clipboard-text"></div>
+				<div class="save-button noselect">
+					<div class="download">Download 🖫</div>
+				</div>
+		</div>
+
+
+		<div class="sidebar">
+				<i class="material-icons md-light md-7vh md-inactive noselect" id="view_headline">view_headline</i>
+				<i class="material-icons md-light md-7vh md-inactive noselect" id="assignment">assignment</i>
+				<i class="material-icons md-light md-7vh md-inactive noselect" id="settings">settings</i>
+				<i class="material-icons md-light md-7vh md-inactive noselect" id="contact_mail">contact_mail</i>
+		</div>
+
+
+
+
+</body>
+</html>
